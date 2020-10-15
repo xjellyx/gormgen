@@ -1,48 +1,8 @@
 # gormgen
 
-gormgen is a code generation tool to generate a better API to query and update [gorm](https://gorm.io) structs without having to deal with `interface{}`s or with database column names.
+gormgen是一种代码生成工具，可以生成更好的API来查询和更新[gorm]（https://gorm.io）结构，而无需处理“ interface {}”或数据库列名称。
 
-**Note** : gormgen is still is still in early development phase. It may contain bugs and the API is not yet stable. Your suggestions for improving gormgen are welcome through issues/PRs.
-
-## Why to use gormgen
-
-```go
-
-// Querying
-
-// The gorm way:
-users := []User{}
-err := db.Where("age > ?", 20).Order("age ASC").Limit(10).Find(&users).Error
-
-// gormgen way
-users, err := (&UserQueryBuilder{}).
-  WhereAge(gormgen.GreaterThanPredicate, 20).
-  OrderByAge(true).
-  Limit(10).
-  QueryAll(db)
-
-
-// Creating Object
-user := &User{
-  Name: "Bla",
-  Age: 20,
-}
-
-// The gorm way
-err := db.Create(user).Error
-
-// The gormgen way
-err := user.Save(db)
-```
-
-- No more ugly `interface{}`s when doing in the `Where` function. Using gormgen, the passed values will be type checked.
-- No more ugly strings for column names for `Where` and `Order` functions. By this, you won't need to convert the field name to the column name yourself, gormgen will do it for you. Also, you won't forget to change a column name when you change the field name because your code won't compile until you fix it everywhere.
-- Query results are returned in a more intuitive way instead of passing them as a param. Also the errors are returned the "Go" way instead of explicitly accessing them.
-- It doesn't alter your struct, so it's still compatible with gorm and you can still use the gorm way whenever you want (or for missing features in gormgen).
-
-## How it works
-
-If you have the following :
+## 如何运行
 
 ```go
 //go:generate gormgen -structs User,Admin -inputDir . -importPkgs gorm.io/gorm -transformErr true
@@ -61,15 +21,13 @@ type Admin struct {
 }
 ```
 
-Run `go generate` and gormgen will generate go file for you :
+运行 `go generate` 会生成对应的go文件在example目录下 :
 `
 gen_admin.go
 gen_user.go
 `
 
-For the actual generated code, check the examples folder.
-
-## install
+## 安装
  - `git clone github.com/olongfen/gormgen`
  - `cd cmd/gormgen/ `
  - `go build -o gormgen main.go`
@@ -77,25 +35,20 @@ For the actual generated code, check the examples folder.
  - `gormgen -structs User,Admin -inputDir ./example -importPkgs gorm.io/gorm -transformErr true`
 
 
-## How to use it
+## 使用
 
 - `go get -u github.com/olongfen/gormgen/...`
-- Add the `//go:generate` comment mentioned above anywhere in your code.
-- Add `go generate` to your build steps.
+-　在你的模型文件中添加 `//go:generate`,如上代码所示.
+- 执行命令即可.
 
-## Not yet supported features
-- [X] Inferring database column name from gorm convention or gorm struct tag.
-- [X] Support for anonymous structs (IMPORTANT for gorm.Model).
+## 功能
+- [X] 可以转换数据库错误
+- [X] 根据模型生成相对应代码，唯一键和主键会生成相对应的方法
+- [X] 可以添加日志
 
-## Contributing
+## 贡献
+如果你有什么想法或者建议可以提交代码合并请求
 
-Your contributions and ideas are welcomed through issues and pull requests.
-
-*Note for development* : Make sure to have `gormgen` in your path to be able to run the tests. Also, always run the tests with `make test` to regenerate the test structs.
-
-## reference 
+## 参考
 - github.com/MohamedBassem/gormgen
 
-## Note
-
-The parser of this package is heavily inspired from the source code of `https://godoc.org/golang.org/x/tools/cmd/stringer`. That's where I learned how to parse and type check a go package.
