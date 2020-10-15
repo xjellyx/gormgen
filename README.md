@@ -1,6 +1,6 @@
 # gormgen
 
-gormgen是一种代码生成工具，可以生成更好的API来查询和更新[gorm]（https://gorm.io）结构，而无需处理“ interface {}”或数据库列名称。
+gormgen是一种代码生成工具，可以生成更好的API来查询和更新[gorm](https://gorm.io)结构，而无需处理 interface {}或数据库列名称。
 
 ## 如何运行
 
