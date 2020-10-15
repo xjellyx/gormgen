@@ -93,6 +93,9 @@ Your contributions and ideas are welcomed through issues and pull requests.
 
 *Note for development* : Make sure to have `gormgen` in your path to be able to run the tests. Also, always run the tests with `make test` to regenerate the test structs.
 
+## reference 
+- github.com/MohamedBassem/gormgen
+
 ## Note
 
 The parser of this package is heavily inspired from the source code of `https://godoc.org/golang.org/x/tools/cmd/stringer`. That's where I learned how to parse and type check a go package.
