@@ -4,6 +4,6 @@ echo $dir
 
 go build -o gormgen ./cmd/gormgen/main.go
 
-mv gormgen $dir
+mv gormgen $dir/bin
 
 echo "install success"

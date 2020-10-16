@@ -57,7 +57,6 @@ func main() {
 		gen = gen.TransformError()
 	}
 	if err := gen.ParserAST(p, cnf.structs).Generate().Format().Flush(); err != nil {
-
 		log.Fatalln(err)
 	}
 
