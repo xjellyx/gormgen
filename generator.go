@@ -17,7 +17,6 @@ type fieldConfig struct {
 	FieldName  string
 	ColumnName string
 	FieldType  string
-	Tag        string
 }
 
 // structConfig

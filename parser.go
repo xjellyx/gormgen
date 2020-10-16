@@ -7,6 +7,7 @@ import (
 	"go/parser"
 	"go/token"
 	"log"
+	"strings"
 )
 
 // The Parser is used to parse a directory and expose information about the structs defined in the files of this directory.
@@ -83,7 +84,19 @@ func (p *Parser) parseTypes(file *ast.File) (ret []structConfig) {
 					}
 					continue
 				}
+				// get field tag
+				if v.Tag != nil {
+					if strings.Contains(v.Tag.Value, "gorm") {
+						if !strings.Contains(v.Tag.Value, "unique") && !strings.Contains(v.Tag.Value, "primary") {
+							continue
+						}
+					} else {
+						continue
+					}
 
+				} else {
+					continue
+				}
 				// type is ident, get field type
 				if t, _ok := v.Type.(*ast.Ident); _ok {
 					field.FieldType = t.String()
@@ -93,10 +106,7 @@ func (p *Parser) parseTypes(file *ast.File) (ret []structConfig) {
 					field.FieldName = v.Names[0].String()
 					field.ColumnName = gorm.ToDBName(field.FieldName)
 				}
-				// get field tag
-				if v.Tag != nil {
-					field.Tag = v.Tag.Value
-				}
+
 				data.Fields = append(data.Fields, field)
 			}
 			ret = append(ret, data)

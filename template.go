@@ -31,6 +31,10 @@ import (
 	)
 {{end}}
 
+	// New{{.StructName}} new
+	func New{{.StructName}}()*{{.StructName}}{
+		return new({{.StructName}})
+	}
 	// Add add one record
 	func (t *{{.StructName}}) Add(db *gorm.DB)(err error) {
 		if err = db.Create(t).Error;err!=nil{
@@ -79,6 +83,11 @@ import (
 
 	{{$StructName := .StructName}}
 	{{range .Fields}}
+		// QueryBy{{.FieldName}} query cond by {{.FieldName}}
+		func (t *{{$StructName}}) SetQueryBy{{.FieldName}}({{.ColumnName}} {{.FieldType}})*{{$StructName}} {
+			t.{{.FieldName}} = {{.ColumnName}}
+			return  t
+		}
 		// GetBy{{.FieldName}} get one record by {{.FieldName}}
 		func (t *{{$StructName}})GetBy{{.FieldName}}(db *gorm.DB)(err error){
 			if err = db.First(t,"{{.ColumnName}} = ?",t.{{.FieldName}}).Error;err!=nil{
