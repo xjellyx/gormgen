@@ -88,7 +88,7 @@ func (g *Generator) ParserStruct(ptrs []interface{}) (ret *Generator) {
 			v          = reflect.ValueOf(ptr).Elem()
 		)
 		l := strings.Split(strings.Split(v.String(), " ")[0], ".")
-		structData.StructName = l[len(l)-1]
+		structData.StructName = gorm.ToDBName(l[len(l)-1])
 		for i := 0; i < v.NumField(); i++ {
 			var (
 				field fieldConfig
@@ -119,7 +119,7 @@ func (g *Generator) ParserStruct(ptrs []interface{}) (ret *Generator) {
 // ParserAST parse by go file
 func (g *Generator) ParserAST(p *Parser, structs []string) (ret *Generator) {
 	for _, v := range structs {
-		g.buf[v] = new(bytes.Buffer)
+		g.buf[gorm.ToDBName(v)] = new(bytes.Buffer)
 	}
 	g.structConfigs = p.Parse()
 	g.config.PkgName = p.pkg.Name

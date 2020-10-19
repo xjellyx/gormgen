@@ -69,7 +69,8 @@ func (p *Parser) parseTypes(file *ast.File) (ret []structConfig) {
 			if structType, ok = typeSpec.Type.(*ast.StructType); !ok {
 				continue
 			}
-			data.StructName = typeSpec.Name.Name
+
+			data.StructName = gorm.ToDBName(typeSpec.Name.Name)
 			for _, v := range structType.Fields.List {
 				var (
 					field fieldConfig

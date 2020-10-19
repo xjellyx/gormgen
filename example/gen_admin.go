@@ -7,110 +7,110 @@ import (
 )
 
 var (
-	ErrCreateAdmin = errors.New("create Admin failed")
-	ErrDeleteAdmin = errors.New("delete Admin failed")
-	ErrGetAdmin    = errors.New("get Admin failed")
-	ErrUpdateAdmin = errors.New("update Admin failed")
+	ErrCreateadmin = errors.New("create admin failed")
+	ErrDeleteadmin = errors.New("delete admin failed")
+	ErrGetadmin    = errors.New("get admin failed")
+	ErrUpdateadmin = errors.New("update admin failed")
 )
 
-// NewAdmin new
-func NewAdmin() *Admin {
-	return new(Admin)
+// Newadmin new
+func Newadmin() *admin {
+	return new(admin)
 }
 
 // Add add one record
-func (t *Admin) Add(db *gorm.DB) (err error) {
+func (t *admin) Add(db *gorm.DB) (err error) {
 	if err = db.Create(t).Error; err != nil {
 
-		err = ErrCreateAdmin
+		err = ErrCreateadmin
 		return
 	}
 	return
 }
 
 // Delete delete record
-func (t *Admin) Delete(db *gorm.DB) (err error) {
+func (t *admin) Delete(db *gorm.DB) (err error) {
 	if err = db.Delete(t).Error; err != nil {
 
-		err = ErrDeleteAdmin
+		err = ErrDeleteadmin
 		return
 	}
 	return
 }
 
 // Updates update record
-func (t *Admin) Updates(db *gorm.DB, m map[string]interface{}) (err error) {
+func (t *admin) Updates(db *gorm.DB, m map[string]interface{}) (err error) {
 	if err = db.Where("id = ?", t.ID).Updates(m).Error; err != nil {
 
-		err = ErrUpdateAdmin
+		err = ErrUpdateadmin
 		return
 	}
 	return
 }
 
-// GetAdminAll get all record
-func GetAdminAll(db *gorm.DB) (ret []*Admin, err error) {
+// GetadminAll get all record
+func GetadminAll(db *gorm.DB) (ret []*admin, err error) {
 	if err = db.Find(&ret).Error; err != nil {
 
-		err = ErrGetAdmin
+		err = ErrGetadmin
 		return
 	}
 	return
 }
 
-// GetAdminCount get count
-func GetAdminCount(db *gorm.DB) (ret int64) {
-	db.Model(&Admin{}).Count(&ret)
+// GetadminCount get count
+func GetadminCount(db *gorm.DB) (ret int64) {
+	db.Model(&admin{}).Count(&ret)
 	return
 }
 
 // QueryByID query cond by ID
-func (t *Admin) SetQueryByID(id uint) *Admin {
+func (t *admin) SetQueryByID(id uint) *admin {
 	t.ID = id
 	return t
 }
 
 // GetByID get one record by ID
-func (t *Admin) GetByID(db *gorm.DB) (err error) {
+func (t *admin) GetByID(db *gorm.DB) (err error) {
 	if err = db.First(t, "id = ?", t.ID).Error; err != nil {
 
-		err = ErrGetAdmin
+		err = ErrGetadmin
 		return
 	}
 	return
 }
 
 // DeleteByID delete record by ID
-func (t *Admin) DeleteByID(db *gorm.DB) (err error) {
+func (t *admin) DeleteByID(db *gorm.DB) (err error) {
 	if err = db.Delete(t, "id = ?", t.ID).Error; err != nil {
 
-		err = ErrDeleteAdmin
+		err = ErrDeleteadmin
 		return
 	}
 	return
 }
 
 // QueryByName query cond by Name
-func (t *Admin) SetQueryByName(name string) *Admin {
+func (t *admin) SetQueryByName(name string) *admin {
 	t.Name = name
 	return t
 }
 
 // GetByName get one record by Name
-func (t *Admin) GetByName(db *gorm.DB) (err error) {
+func (t *admin) GetByName(db *gorm.DB) (err error) {
 	if err = db.First(t, "name = ?", t.Name).Error; err != nil {
 
-		err = ErrGetAdmin
+		err = ErrGetadmin
 		return
 	}
 	return
 }
 
 // DeleteByName delete record by Name
-func (t *Admin) DeleteByName(db *gorm.DB) (err error) {
+func (t *admin) DeleteByName(db *gorm.DB) (err error) {
 	if err = db.Delete(t, "name = ?", t.Name).Error; err != nil {
 
-		err = ErrDeleteAdmin
+		err = ErrDeleteadmin
 		return
 	}
 	return
