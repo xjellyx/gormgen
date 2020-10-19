@@ -10,9 +10,9 @@ import (
 )
 
 type config struct {
-	input      string
-	importPkgs []gormgen.ImportPkg
-	structs    []string
+	input   string
+	imports []gormgen.ImportPkg
+	structs []string
 }
 
 var (
@@ -22,26 +22,27 @@ var (
 )
 
 func parseFlags() {
-	var inputDir, structs, importPkgs string
+
+	var input, structs, imports string
 	flag.StringVar(&structs, "structs", "", "[Required] The name of schema structs to generate structs for, comma seperated")
-	flag.StringVar(&inputDir, "inputDir", "", "[Required] The name of the inputDir file")
-	flag.StringVar(&importPkgs, "importPkgs", "", "[Required] The name of the importPkgs to import")
+	flag.StringVar(&input, "input", "", "[Required] The name of the input file dir")
+	flag.StringVar(&imports, "imports", "", "[Required] The name of the import  to import package")
 	flag.StringVar(&logName, "logName", "", "[Option] The name of log db error")
 	flag.BoolVar(&transformErr, "transformErr", false, "[Option] The name of transform db err")
 	flag.Parse()
 
-	if inputDir == "" || structs == "" || len(importPkgs) == 0 {
+	if input == "" || structs == "" || len(imports) == 0 {
 		flag.Usage()
 		os.Exit(1)
 	}
 
 	cnf = config{
-		input:   inputDir,
+		input:   input,
 		structs: strings.Split(structs, ","),
 	}
-	s := strings.Split(importPkgs, ",")
+	s := strings.Split(imports, ",")
 	for _, v := range s {
-		cnf.importPkgs = append(cnf.importPkgs, gormgen.ImportPkg{
+		cnf.imports = append(cnf.imports, gormgen.ImportPkg{
 			Pkg: v,
 		})
 	}
@@ -52,7 +53,7 @@ func main() {
 
 	p := gormgen.NewParser(cnf.input)
 
-	gen := gormgen.NewGenerator(cnf.input).SetImportPkg(cnf.importPkgs).SetLogName(logName)
+	gen := gormgen.NewGenerator(cnf.input).SetImportPkg(cnf.imports).SetLogName(logName)
 	if transformErr {
 		gen = gen.TransformError()
 	}

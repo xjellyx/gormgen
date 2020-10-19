@@ -5,7 +5,7 @@ gormgen是一种代码生成工具，可以生成更好的API来查询和更新[
 ## 如何运行
 
 ```go
-//go:generate gormgen -structs User,Admin -inputDir . -importPkgs gorm.io/gorm -transformErr true
+//go:generate gormgen -structs User,Admin -input . -imports gorm.io/gorm -transformErr true
 type User struct {
 	gorm.Model
 	Name  string `json:"name"`
@@ -32,7 +32,7 @@ gen_user.go
  - `cd cmd/gormgen/ `
  - `go build -o gormgen main.go`
  - mv gormgen to GOPATH/bin/
- - `gormgen -structs User,Admin -inputDir ./example -importPkgs gorm.io/gorm -transformErr true`
+ - `gormgen -structs User,Admin -input ./example -imports gorm.io/gorm -transformErr true`
 
 
 ## 使用
