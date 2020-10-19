@@ -88,7 +88,7 @@ func (g *Generator) ParserStruct(ptrs []interface{}) (ret *Generator) {
 			v          = reflect.ValueOf(ptr).Elem()
 		)
 		l := strings.Split(strings.Split(v.String(), " ")[0], ".")
-		structData.StructName = gorm.ToDBName(l[len(l)-1])
+		structData.StructName = l[len(l)-1]
 		for i := 0; i < v.NumField(); i++ {
 			var (
 				field fieldConfig
@@ -147,7 +147,7 @@ func (g *Generator) Generate() *Generator {
 		panic(err)
 	}
 	for _, v := range g.structConfigs {
-		if err := outputTemplate.Execute(g.buf[v.StructName], v); err != nil {
+		if err := outputTemplate.Execute(g.buf[gorm.ToDBName(v.StructName)], v); err != nil {
 			panic(err)
 		}
 	}
