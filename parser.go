@@ -73,42 +73,66 @@ func (p *Parser) parseTypes(file *ast.File) (ret []structConfig) {
 			data.StructName = typeSpec.Name.Name
 			for _, v := range structType.Fields.List {
 				var (
-					field fieldConfig
+					onlyField   fieldConfig
+					optionField fieldConfig
 				)
 				// type is select expr, and sel is Model , else continue
 				if _v, _ok := v.Type.(*ast.SelectorExpr); _ok {
 					if _v.Sel.Name == "Model" {
-						field.FieldName = "ID"
-						field.FieldType = "uint"
-						field.ColumnName = gorm.ToDBName("ID")
-						data.Fields = append(data.Fields, field)
+						onlyField.FieldName = "ID"
+						onlyField.FieldType = "uint"
+						onlyField.ColumnName = gorm.ToDBName("ID")
+						onlyField.HumpName = SQLColumnToHumpStyle(onlyField.ColumnName)
+						data.OnlyFields = append(data.OnlyFields, onlyField)
+
+						f1 := fieldConfig{}
+						f1.FieldName = "CreatedAt"
+						f1.FieldType = "time.Time"
+						f1.ColumnName = gorm.ToDBName("CreatedAt")
+						f1.HumpName = SQLColumnToHumpStyle(f1.ColumnName)
+						data.OptionFields = append(data.OptionFields, f1)
+
+						f2 := fieldConfig{}
+						f2.FieldName = "UpdatedAt"
+						f2.FieldType = "time.Time"
+						f2.ColumnName = gorm.ToDBName("UpdatedAt")
+						f2.HumpName = SQLColumnToHumpStyle(f2.ColumnName)
+						data.OptionFields = append(data.OptionFields, f2)
 					}
 					continue
 				}
-				// get field tag
+				// get onlyField tag
 				if v.Tag != nil {
-					if strings.Contains(v.Tag.Value, "gorm") {
-						if !strings.Contains(v.Tag.Value, "unique") && !strings.Contains(v.Tag.Value, "primary") {
-							continue
+					if strings.Contains(v.Tag.Value, "gorm") && strings.Contains(v.Tag.Value, "unique") ||
+						strings.Contains(v.Tag.Value, "primary") {
+						// type is ident, get onlyField type
+						if t, _ok := v.Type.(*ast.Ident); _ok {
+							onlyField.FieldType = t.String()
 						}
-					} else {
+						// get file name
+						if len(v.Names) > 0 {
+							onlyField.FieldName = v.Names[0].String()
+							onlyField.ColumnName = gorm.ToDBName(onlyField.FieldName)
+						}
+
+						data.OnlyFields = append(data.OnlyFields, onlyField)
 						continue
 					}
-
-				} else {
-					continue
 				}
-				// type is ident, get field type
+
+				// type is ident, get onlyField type
 				if t, _ok := v.Type.(*ast.Ident); _ok {
-					field.FieldType = t.String()
+					optionField.FieldType = t.String()
 				}
 				// get file name
 				if len(v.Names) > 0 {
-					field.FieldName = v.Names[0].String()
-					field.ColumnName = gorm.ToDBName(field.FieldName)
+					optionField.FieldName = v.Names[0].String()
+					optionField.ColumnName = gorm.ToDBName(optionField.FieldName)
+					optionField.HumpName = SQLColumnToHumpStyle(optionField.ColumnName)
 				}
 
-				data.Fields = append(data.Fields, field)
+				data.OptionFields = append(data.OptionFields, optionField)
+
 			}
 			ret = append(ret, data)
 		}

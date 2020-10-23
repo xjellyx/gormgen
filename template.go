@@ -1,6 +1,9 @@
 package gormgen
 
-import "text/template"
+import (
+	"fmt"
+	"text/template"
+)
 
 func parseTemplateOrPanic(t string) *template.Template {
 	tpl, err := template.New("output_template").Parse(t)
@@ -10,10 +13,20 @@ func parseTemplateOrPanic(t string) *template.Template {
 	return tpl
 }
 
-var outputTemplate = parseTemplateOrPanic(`
+var commonTemplate = parseTemplateOrPanic(fmt.Sprintf(`
+package {{.PkgName}}
+type fieldData struct {
+		Value interface{} %sjson:"value" form:"value"%s
+		Symbol string %sjson:"symbol" form:"symbol"%s
+	
+}
+`, "`", "`", "`", "`"))
+
+var outputTemplate = parseTemplateOrPanic(fmt.Sprintf(`
 package {{.PkgName}}
 {{$TransformErr :=.TransformErr}}
 import (
+	"time"
 {{if $TransformErr}} "errors" {{end}}
 	{{range .ImportPkgs}}
 	"{{.Pkg}}"
@@ -38,7 +51,7 @@ import (
 	// Add add one record
 	func (t *{{.StructName}}) Add(db *gorm.DB)(err error) {
 		if err = db.Create(t).Error;err!=nil{
-			{{if $LogName}} {{ $LogName}}.Errorln(err) {{end}}
+			{{if $LogName}} {{ $LogName}}.Errorln(err){{end}}
 			{{if $TransformErr}} err = ErrCreate{{.StructName}}{{end}}
 			return
 		}
@@ -57,7 +70,7 @@ import (
 	
 	// Updates update record
 	func (t *{{.StructName}}) Updates(db *gorm.DB, m map[string]interface{})(err error) {
-		if err = db.Where("id = ?",t.ID).Updates(m).Error;err!=nil{
+		if err = db.Model(&{{.StructName}}{}).Where("id = ?",t.ID).Updates(m).Error;err!=nil{
 			{{if $LogName}} {{ $LogName}}.Errorln(err) {{end}}
 			{{if $TransformErr}} err = ErrUpdate{{.StructName}} {{end}}
 			return
@@ -82,7 +95,41 @@ import (
 	}
 
 	{{$StructName := .StructName}}
-	{{range .Fields}}
+	type Query{{$StructName}}Form struct{
+	{{range .OptionFields}} {{.FieldName}} *fieldData %sjson:"{{.HumpName}}" form:"{{.HumpName}}"%s; {{end}}
+		Order []string %sjson:"order" form:"order"%s
+		PageNum int %sjson:"pageNum" form:"pageNum"%s
+		PageSize int %sjson:"pageSize" form:"pageSize"%s
+		}
+
+	//  Get{{$StructName}}List get {{$StructName}} list some field value or some condition
+	func Get{{$StructName}}List(q *Query{{$StructName}}Form, db *gorm.DB)(ret []*{{$StructName}},err error){
+		// order
+		if len(q.Order)>0{
+			for _,v:=range q.Order {
+				db = db.Order(v)
+			}
+		}
+		// pageSize
+		if q.PageSize!=0{
+			db = db.Limit(q.PageSize)
+		}
+		// pageNum
+		if q.PageNum!=0{
+			q.PageNum = (q.PageNum - 1) * q.PageSize
+			db = db.Offset(q.PageNum)
+		}
+	{{range .OptionFields}} 
+		// {{.FieldName}}
+		if q.{{.FieldName}}!=nil{
+			db = db.Where("{{.ColumnName}}" +q.{{.FieldName}}.Symbol +"?",q.{{.FieldName}}.Value)
+		}  ; {{end}}
+		if err = db.Find(&ret).Error;err!=nil{
+			return	
+		}
+		return 
+	}
+	{{range .OnlyFields}}
 		// QueryBy{{.FieldName}} query cond by {{.FieldName}}
 		func (t *{{$StructName}}) SetQueryBy{{.FieldName}}({{.ColumnName}} {{.FieldType}})*{{$StructName}} {
 			t.{{.FieldName}} = {{.ColumnName}}
@@ -107,4 +154,4 @@ import (
 			return
 		}
 	{{end}}
-`)
+`, "`", "`", "`", "`", "`", "`", "`", "`"))

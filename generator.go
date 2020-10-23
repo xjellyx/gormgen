@@ -17,13 +17,15 @@ type fieldConfig struct {
 	FieldName  string
 	ColumnName string
 	FieldType  string
+	HumpName   string
 }
 
 // structConfig
 type structConfig struct {
 	config
-	StructName string
-	Fields     []fieldConfig
+	StructName   string
+	OnlyFields   []fieldConfig
+	OptionFields []fieldConfig
 }
 
 type ImportPkg struct {
@@ -100,16 +102,34 @@ func (g *Generator) ParserStruct(ptrs []interface{}) (ret *Generator) {
 				field.FieldName = "ID"
 				field.FieldType = "uint"
 				field.ColumnName = gorm.ToDBName("ID")
+				structData.OnlyFields = append(structData.OnlyFields, field)
+				f1 := fieldConfig{}
+				f1.FieldName = "CreatedAt"
+				f1.FieldType = "time.Time"
+				f1.ColumnName = gorm.ToDBName("CreatedAt")
+				f1.HumpName = SQLColumnToHumpStyle(f1.ColumnName)
+				structData.OptionFields = append(structData.OptionFields, f1)
+
+				f2 := fieldConfig{}
+				f2.FieldName = "UpdatedAt"
+				f2.FieldType = "time.Time"
+				f2.ColumnName = gorm.ToDBName("UpdatedAt")
+				f2.HumpName = SQLColumnToHumpStyle(f2.ColumnName)
+				structData.OptionFields = append(structData.OptionFields, f2)
 			} else {
 				if !strings.Contains(tagValue, "unique") && !strings.Contains(tagValue, "primary") {
+					field.FieldName = structField.Name
+					field.FieldType = structField.Type.String()
+					field.ColumnName = gorm.ToDBName(structField.Name)
+					structData.OptionFields = append(structData.OptionFields, field)
 					continue
 				}
 				field.FieldName = structField.Name
 				field.FieldType = structField.Type.String()
 				field.ColumnName = gorm.ToDBName(structField.Name)
+				structData.OnlyFields = append(structData.OnlyFields, field)
 			}
 
-			structData.Fields = append(structData.Fields, field)
 		}
 		g.structConfigs = append(g.structConfigs, structData)
 	}
@@ -146,7 +166,14 @@ func (g *Generator) Generate() *Generator {
 	if err := g.checkConfig(); err != nil {
 		panic(err)
 	}
+	g.buf["common"] = &bytes.Buffer{}
+	if err := commonTemplate.Execute(g.buf["common"], g.config); err != nil {
+		panic(err)
+	}
 	for _, v := range g.structConfigs {
+		if _, ok := g.buf[gorm.ToDBName(v.StructName)]; !ok {
+			continue
+		}
 		if err := outputTemplate.Execute(g.buf[gorm.ToDBName(v.StructName)], v); err != nil {
 			panic(err)
 		}
@@ -170,7 +197,8 @@ func (g *Generator) Format() *Generator {
 // Flush function writes the output to the output file.
 func (g *Generator) Flush() error {
 	for k, _ := range g.buf {
-		if err := ioutil.WriteFile(g.inputFile+"/gen_"+strings.ToLower(k)+".go", g.buf[k].Bytes(), 0777); err != nil {
+		filename := g.inputFile + "/gen_" + strings.ToLower(k) + ".go"
+		if err := ioutil.WriteFile(filename, g.buf[k].Bytes(), 0777); err != nil {
 			log.Fatalln(err)
 		}
 	}
