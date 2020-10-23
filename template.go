@@ -15,7 +15,7 @@ func parseTemplateOrPanic(t string) *template.Template {
 
 var commonTemplate = parseTemplateOrPanic(fmt.Sprintf(`
 package {{.PkgName}}
-type fieldData struct {
+type FieldData struct {
 		Value interface{} %sjson:"value" form:"value"%s
 		Symbol string %sjson:"symbol" form:"symbol"%s
 	
@@ -96,7 +96,7 @@ import (
 
 	{{$StructName := .StructName}}
 	type Query{{$StructName}}Form struct{
-	{{range .OptionFields}} {{.FieldName}} *fieldData %sjson:"{{.HumpName}}" form:"{{.HumpName}}"%s; {{end}}
+	{{range .OptionFields}} {{.FieldName}} *FieldData %sjson:"{{.HumpName}}" form:"{{.HumpName}}"%s; {{end}}
 		Order []string %sjson:"order" form:"order"%s
 		PageNum int %sjson:"pageNum" form:"pageNum"%s
 		PageSize int %sjson:"pageSize" form:"pageSize"%s
