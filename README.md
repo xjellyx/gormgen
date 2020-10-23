@@ -51,6 +51,8 @@ gen_user.go
 - 完成test
 - 其他
 
+## [godoc](https://godoc.org/github.com/olongfen/gormgen)
+
 ## 贡献
 如果你有什么想法或者建议可以提交代码合并请求
 
