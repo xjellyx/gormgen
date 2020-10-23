@@ -2,7 +2,6 @@ package example
 
 import (
 	"errors"
-	"time"
 
 	"gorm.io/gorm"
 )
@@ -66,10 +65,10 @@ func GetAdminCount(db *gorm.DB) (ret int64) {
 }
 
 type QueryAdminForm struct {
-	CreatedAt *fieldData `json:"createdAt" form:"createdAt"`
-	UpdatedAt *fieldData `json:"updatedAt" form:"updatedAt"`
-	Age       *fieldData `json:"age" form:"age"`
-	Email     *fieldData `json:"email" form:"email"`
+	CreatedAt *FieldData `json:"createdAt" form:"createdAt"`
+	UpdatedAt *FieldData `json:"updatedAt" form:"updatedAt"`
+	Age       *FieldData `json:"age" form:"age"`
+	Email     *FieldData `json:"email" form:"email"`
 	Order     []string   `json:"order" form:"order"`
 	PageNum   int        `json:"pageNum" form:"pageNum"`
 	PageSize  int        `json:"pageSize" form:"pageSize"`

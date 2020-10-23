@@ -26,7 +26,6 @@ var outputTemplate = parseTemplateOrPanic(fmt.Sprintf(`
 package {{.PkgName}}
 {{$TransformErr :=.TransformErr}}
 import (
-	"time"
 {{if $TransformErr}} "errors" {{end}}
 	{{range .ImportPkgs}}
 	"{{.Pkg}}"
