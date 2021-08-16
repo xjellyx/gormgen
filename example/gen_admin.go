@@ -40,7 +40,7 @@ func (t *Admin) Delete(db *gorm.DB) (err error) {
 
 // Updates update record
 func (t *Admin) Updates(db *gorm.DB, m map[string]interface{}) (err error) {
-	if err = db.Model(&Admin{}).Where("id = ?", t.ID).Updates(m).Error; err != nil {
+	if err = db.Model(t).Updates(m).Error; err != nil {
 
 		err = ErrUpdateAdmin
 		return
