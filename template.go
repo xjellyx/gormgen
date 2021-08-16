@@ -69,7 +69,7 @@ import (
 	
 	// Updates update record
 	func (t *{{.StructName}}) Updates(db *gorm.DB, m map[string]interface{})(err error) {
-		if err = db.Model(&{{.StructName}}{}).Where("id = ?",t.ID).Updates(m).Error;err!=nil{
+		if err = db.Model(t).Updates(m).Error;err!=nil{
 			{{if $LogName}} {{ $LogName}}.Errorln(err) {{end}}
 			{{if $TransformErr}} err = ErrUpdate{{.StructName}} {{end}}
 			return
