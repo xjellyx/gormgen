@@ -40,7 +40,7 @@ func (t *User) Delete(db *gorm.DB) (err error) {
 
 // Updates update record
 func (t *User) Updates(db *gorm.DB, m map[string]interface{}) (err error) {
-	if err = db.Model(&User{}).Where("id = ?", t.ID).Updates(m).Error; err != nil {
+	if err = db.Model(t).Updates(m).Error; err != nil {
 
 		err = ErrUpdateUser
 		return
